@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royce | Application Design & Developer — EY GDS Philippines</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts: Outfit, Plus Jakarta Sans, Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #0d0d0d;
+            --bg-card: #1e1e1e;
+            --bg-card-hover: #262626;
+            --ey-yellow: #FFE600;
+            --ey-yellow-glow: rgba(255, 230, 0, 0.12);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-color-hover: rgba(255, 230, 0, 0.4);
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0AB;
+            --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-heading {
+            font-family: var(--font-heading);
+            color: var(--text-primary);
+        }
+
+        /* Glassmorphism surfaces */
+        .glass-panel {
+            background: rgba(30, 30, 30, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: var(--border-color-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(255, 230, 0, 0.08);
+        }
+
+        /* Ambient Glow & Grid Backdrop */
+        .ambient-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--ey-yellow-glow) 0%, transparent 70%);
+            top: -100px;
+            right: -100px;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(60px);
+        }
+
+        /* Navigation Styling */
+        .navbar-custom {
+            background: rgba(13, 13, 13, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.25s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--ey-yellow) !important;
+        }
+
+        /* Brand Colors & Badges */
+        .text-ey { color: var(--ey-yellow) !important; }
+        .bg-ey { background-color: var(--ey-yellow) !important; color: #000 !important; }
+
+        .badge-ey {
+            background: rgba(255, 230, 0, 0.1);
+            color: var(--ey-yellow);
+            border: 1px solid rgba(255, 230, 0, 0.3);
+            font-size: 0.85rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-up {
+            background: rgba(123, 17, 19, 0.2);
+            color: #ff8a8c;
+            border: 1px solid rgba(123, 17, 19, 0.5);
+            font-size: 0.85rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-lunatech {
+            background: rgba(0, 174, 239, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(0, 174, 239, 0.3);
+            font-size: 0.85rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Custom Action Buttons */
+        .btn-ey {
+            background: var(--ey-yellow);
+            color: #000000;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.6rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ey:hover {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 25px rgba(255, 230, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-custom {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1.6rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-custom:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--ey-yellow);
+            border-color: var(--ey-yellow);
+            transform: translateY(-2px);
+        }
+
+        /* Marquee Ticker */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            background: rgba(30, 30, 30, 0.8);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 0;
+        }
+
+        .marquee-track {
+            display: inline-flex;
+            animation: marquee 28s linear infinite;
+        }
+
+        .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-right: 3.5rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Skill Pills & Filters */
+        .skill-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.25s ease;
+        }
+
+        .skill-pill:hover {
+            background: rgba(255, 230, 0, 0.1);
+            border-color: var(--ey-yellow);
+            color: var(--ey-yellow);
+        }
+
+        .filter-chip {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.45rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+
+        .filter-chip.active, .filter-chip:hover {
+            background: var(--ey-yellow);
+            color: #000000;
+            border-color: var(--ey-yellow);
+            font-weight: 700;
+        }
+
+        .section-tag {
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--ey-yellow);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #scrollTopBtn:hover {
+            background: var(--ey-yellow);
+            color: #000000;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-grid"></div>
+    <div class="ambient-glow"></div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom">
+        <div class="container">
+            <a class="navbar-brand font-heading fw-bold d-flex align-items-center gap-2" href="#hero">
+                <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+                    <rect width="100" height="100" rx="20" fill="#1e1e1e"/>
+                    <path d="M20 20H80V35H40V45H75V60H40V80H20V20Z" fill="#FFE600"/>
+                    <polygon points="60,80 85,80 95,60 70,60" fill="#FFE600"/>
+                </svg>
+                <span>ROYCE<span class="text-ey">.</span></span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+                    <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#sozialme">SozialMe</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#ai-strategy">AI Strategy</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#education">Education</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+                    <li class="nav-item ms-lg-2">
+                        <button class="btn btn-ey btn-sm" onclick="triggerResumeModal()">
+                            <i class="fa-solid fa-file-arrow-down me-1"></i> Download CV
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="hero" class="pt-5 mt-5 min-vh-100 d-flex align-items-center position-relative">
+        <div class="container py-5">
+            <div class="row align-items-center gy-5">
+                <div class="col-lg-8">
+                    <div class="mb-3">
+                        <span class="badge-ey">
+                            <svg width="18" height="18" viewBox="0 0 100 100" fill="none">
+                                <rect width="100" height="100" rx="15" fill="#000000"/>
+                                <path d="M25 25H75V38H42V48H70V60H42V75H25V25Z" fill="#FFE600"/>
+                            </svg>
+                            <strong>EY GDS Philippines</strong> • Oracle Practice & AI Strategy
+                        </span>
+                    </div>
+
+                    <h1 class="display-2 fw-extrabold text-white mb-2">Royce</h1>
+
+                    <h2 class="h3 text-ey fw-semibold mb-4">
+                        Application Design & Developer at EY GDS Philippines
+                    </h2>
+
+                    <p class="lead text-secondary mb-4 col-lg-11 lh-base">
+                        Specializing in Enterprise Data Solutions, Oracle Cloud Utilities (ORMB & CCS), AI Innovation Strategy, and Modern Software Engineering.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-3 mb-5">
+                        <a href="https://linkedin.com" target="_blank" rel="noopener" class="btn btn-ey d-inline-flex align-items-center gap-2">
+                            <i class="fa-brands fa-linkedin fs-5"></i> Connect on LinkedIn
+                        </a>
+                        <a href="#experience" class="btn btn-outline-custom d-inline-flex align-items-center gap-2">
+                            <i class="fa-solid fa-briefcase fs-5"></i> View Experience
+                        </a>
+                        <button class="btn btn-outline-custom d-inline-flex align-items-center gap-2" onclick="triggerResumeModal()">
+                            <i class="fa-solid fa-download fs-5"></i> Download CV
+                        </button>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <div class="glass-panel p-3 text-center">
+                                <div class="h3 fw-bold text-white mb-0">Big 4</div>
+                                <div class="small text-secondary">Global Delivery</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="glass-panel p-3 text-center">
+                                <div class="h3 fw-bold text-ey mb-0">ORMB/CCS</div>
+                                <div class="small text-secondary">Oracle Cloud Suite</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="glass-panel p-3 text-center">
+                                <div class="h3 fw-bold text-white mb-0">AI Practice</div>
+                                <div class="small text-secondary">Innovation Strategy</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="glass-panel p-3 text-center">
+                                <div class="h3 fw-bold text-ey mb-0">UP MIS</div>
+                                <div class="small text-secondary">Graduate Scholar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 text-center">
+                    <div class="glass-panel p-4 position-relative">
+                        <div class="mb-3 d-inline-block p-3 rounded-circle bg-dark border border-secondary border-opacity-25">
+                            <i class="fa-solid fa-terminal text-ey display-4"></i>
+                        </div>
+                        <h3 class="h5 fw-bold text-white mb-1">Enterprise Developer</h3>
+                        <p class="small text-secondary mb-3">EY Global Delivery Services</p>
+                        
+                        <div class="text-start bg-black bg-opacity-60 p-3 rounded-3 border border-secondary border-opacity-25 text-light small font-monospace">
+                            <div><span class="text-danger">const</span> developer = {</div>
+                            <div class="ps-3"><span class="text-ey">name</span>: <span class="text-info">'Royce'</span>,</div>
+                            <div class="ps-3"><span class="text-ey">firm</span>: <span class="text-info">'EY GDS Philippines'</span>,</div>
+                            <div class="ps-3"><span class="text-ey">stack</span>: [<span class="text-warning">'ORMB'</span>, <span class="text-warning">'CCS'</span>, <span class="text-warning">'OIC'</span>],</div>
+                            <div class="ps-3"><span class="text-ey">degree</span>: <span class="text-info">'UP MIS'</span></div>
+                            <div>};</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="marquee-container">
+        <div class="marquee-track">
+            <div class="marquee-item"><i class="fa-solid fa-building-columns text-ey"></i> <span>EY GDS Philippines</span></div>
+            <div class="marquee-item"><span class="text-ey">◆</span></div>
+            <div class="marquee-item"><i class="fa-solid fa-code text-info"></i> <span>Lunatech Solutions PH</span></div>
+            <div class="marquee-item"><span class="text-ey">◆</span></div>
+            <div class="marquee-item"><i class="fa-solid fa-graduation-cap text-danger"></i> <span>University of the Philippines</span></div>
+            <div class="marquee-item"><span class="text-ey">◆</span></div>
+            <div class="marquee-item"><i class="fa-solid fa-building-columns text-ey"></i> <span>EY GDS Philippines</span></div>
+            <div class="marquee-item"><span class="text-ey">◆</span></div>
+            <div class="marquee-item"><i class="fa-solid fa-code text-info"></i> <span>Lunatech Solutions PH</span></div>
+            <div class="marquee-item"><span class="text-ey">◆</span></div>
+            <div class="marquee-item"><i class="fa-solid fa-graduation-cap text-danger"></i> <span>University of the Philippines</span></div>
+            <div class="marquee-item"><span class="text-ey">◆</span></div>
+        </div>
+    </div>
+
+    <section id="experience" class="py-5 my-4">
+        <div class="container">
+            <div class="text-center mb-5 max-w-2xl mx-auto">
+                <span class="section-tag">Enterprise Delivery</span>
+                <h2 class="h1 text-white">Professional Experience</h2>
+                <p class="text-secondary">Designing and delivering complex enterprise data solutions at EY GDS Philippines</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="glass-panel p-4 p-md-5 h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-warning bg-opacity-10 text-ey border border-warning border-opacity-25">Current Role</span>
+                            <span class="badge-ey">EY GDS Philippines</span>
+                        </div>
+                        <h3 class="h3 text-white mb-2">ORMB Modernization</h3>
+                        <p class="text-ey fw-medium mb-3">Major U.S. Financial & Health Insurance Client</p>
+                        <p class="text-secondary">
+                            Developing comprehensive reports and modernizing database objects within Oracle Revenue Management and Billing (ORMB) for a major U.S. financial & health insurance client.
+                        </p>
+                        <hr class="border-secondary border-opacity-25 my-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="skill-pill">ORMB</span>
+                            <span class="skill-pill">Database Modernization</span>
+                            <span class="skill-pill">Advanced SQL</span>
+                            <span class="skill-pill">Financial Systems</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="glass-panel p-4 p-md-5 h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">Past Enterprise Focus</span>
+                            <span class="badge-ey">EY GDS Philippines</span>
+                        </div>
+                        <h3 class="h3 text-white mb-2">Oracle Utilities CCS</h3>
+                        <p class="text-info fw-medium mb-3">Power & Utilities Sector</p>
+                        <p class="text-secondary">
+                            Developed and enhanced Customer Cloud Service (CCS) reports aligned to core utility business processes for the Power & Utilities sector.
+                        </p>
+                        <hr class="border-secondary border-opacity-25 my-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="skill-pill">Oracle Utilities CCS</span>
+                            <span class="skill-pill">Power & Utilities</span>
+                            <span class="skill-pill">BI Workflows</span>
+                            <span class="skill-pill">Data Reporting</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="glass-panel p-4 p-md-5">
+                        <div class="row align-items-center gy-4">
+                            <div class="col-lg-8">
+                                <span class="badge bg-secondary bg-opacity-20 text-light mb-2">Core Responsibilities</span>
+                                <h3 class="h3 text-white mb-3">End-to-End Delivery & Quality Assurance</h3>
+                                <p class="text-secondary mb-4">
+                                    Authoring FDDs, leading System Integration Testing (SIT), executing end-to-end report validation, performing meticulous data reconciliation, and resolving defects for seamless production deployments. Supported by foundational expertise in Oracle Integration Cloud (OIC).
+                                </p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="skill-pill"><i class="fa-solid fa-file-lines text-ey"></i> FDDs</span>
+                                    <span class="skill-pill"><i class="fa-solid fa-vial-circle-check text-ey"></i> SIT</span>
+                                    <span class="skill-pill"><i class="fa-solid fa-list-check text-ey"></i> End-to-End Validation</span>
+                                    <span class="skill-pill"><i class="fa-solid fa-scale-balanced text-ey"></i> Data Reconciliation</span>
+                                    <span class="skill-pill"><i class="fa-solid fa-bug-slash text-ey"></i> Defect Resolution</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 text-center">
+                                <div class="p-4 rounded-3 bg-black bg-opacity-50 border border-secondary border-opacity-25">
+                                    <i class="fa-solid fa-shield-check display-3 text-ey mb-3"></i>
+                                    <h4 class="h6 text-white text-uppercase font-heading">Production Ready</h4>
+                                    <p class="small text-secondary mb-0">High-reliability enterprise deployments</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sozialme" class="py-5 bg-black bg-opacity-40">
+        <div class="container">
+            <div class="text-center mb-5 max-w-2xl mx-auto">
+                <span class="section-tag">Featured Client Project</span>
+                <h2 class="h1 text-white">Lunatech Solutions PH</h2>
+            </div>
+
+            <div class="glass-panel p-4 p-md-5 border-info border-opacity-30 position-relative overflow-hidden">
+                <div class="row align-items-center gy-4">
+                    <div class="col-lg-7">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <span class="badge-lunatech">
+                                <i class="fa-solid fa-layer-group"></i> Lunatech Solutions PH
+                            </span>
+                        </div>
+
+                        <h3 class="display-5 font-heading text-white fw-bold mb-2">SozialMe</h3>
+                        <p class="lead text-info mb-4">
+                            A location-based social platform engineered with scalable infrastructure and modern cross-platform mobile technology.
+                        </p>
+
+                        <ul class="list-unstyled d-flex flex-column gap-2 text-secondary mb-4">
+                            <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-info"></i> Full-stack platform delivery</li>
+                            <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-info"></i> Scalable mobile/web application architecture</li>
+                            <li class="d-flex align-items-center gap-2"><i class="fa-solid fa-check text-info"></i> Location-based feature development</li>
+                        </ul>
+
+                        <a href="https://www.lunatechsolutionsph.com/" target="_blank" rel="noopener" class="btn btn-ey d-inline-flex align-items-center gap-2">
+                            <span>Visit Lunatech Solutions PH</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <div class="col-lg-5 text-center">
+                        <div class="p-5 bg-black bg-opacity-60 rounded-4 border border-info border-opacity-25">
+                            <i class="fa-solid fa-location-dot display-1 text-info mb-3"></i>
+                            <h4 class="h5 text-white">SozialMe Platform</h4>
+                            <p class="small text-secondary mb-0">Cross-Platform Geospatial Social Engine</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ai-strategy" class="py-5">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-7">
+                    <div class="glass-panel p-4 p-md-5 h-100 border-warning border-opacity-30">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-warning text-dark fw-bold"><i class="fa-solid fa-brain me-1"></i> Special Highlight</span>
+                            <span class="badge-ey">EY GDS Oracle Practice</span>
+                        </div>
+
+                        <h3 class="h2 text-white font-heading fw-bold mb-3">AI Innovation Strategy</h3>
+                        <p class="text-ey fw-medium mb-3">Oracle Practice · AI Innovation Strategy Team</p>
+                        
+                        <p class="text-secondary leading-relaxed mb-4">
+                            Driving AI adoption, fostering technological innovation, and exploring emerging AI capabilities to elevate internal delivery excellence within EY GDS Philippines' Oracle Practice.
+                        </p>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-25">
+                                    <h4 class="h6 text-ey mb-1"><i class="fa-solid fa-robot me-2"></i> AI Adoption Strategy</h4>
+                                    <p class="small text-secondary mb-0">Integrating AI into enterprise development lifecycle.</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-dark bg-opacity-50 rounded-3 border border-secondary border-opacity-25">
+                                    <h4 class="h6 text-ey mb-1"><i class="fa-solid fa-lightbulb me-2"></i> Delivery Excellence</h4>
+                                    <p class="small text-secondary mb-0">Exploring emerging AI capabilities for client solutions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5" id="education">
+                    <div class="glass-panel p-4 p-md-5 h-100 border-danger border-opacity-25">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge-up">
+                                <i class="fa-solid fa-graduation-cap"></i> University of the Philippines
+                            </span>
+                        </div>
+
+                        <h3 class="h3 text-white font-heading fw-bold mb-2">Education & Research</h3>
+                        <p class="text-danger fw-semibold mb-3">Master of Information Systems</p>
+                        <p class="text-secondary mb-3">University of the Philippines · In progress</p>
+
+                        <p class="text-secondary leading-relaxed mb-4">
+                            Bridging advanced academic research with enterprise application architecture.
+                        </p>
+
+                        <div class="p-3 bg-black bg-opacity-50 rounded-3 border border-danger border-opacity-25">
+                            <div class="small text-uppercase text-danger font-monospace mb-1">Academic Focus</div>
+                            <div class="text-white small fw-medium">Enterprise Application Architecture & Information Systems</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-5 bg-black bg-opacity-40">
+        <div class="container">
+            <div class="text-center mb-5 max-w-2xl mx-auto">
+                <span class="section-tag">Expertise</span>
+                <h2 class="h1 text-white">Technical Skills</h2>
+                <p class="text-secondary">Core technical competencies and domain expertise</p>
+            </div>
+
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="skillSearchInput" class="form-control bg-dark border-secondary text-white" placeholder="Search skills...">
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-center flex-wrap gap-2" id="filterChips">
+                    <button class="filter-chip active" data-filter="all">All</button>
+                    <button class="filter-chip" data-filter="oracle">Oracle Ecosystem</button>
+                    <button class="filter-chip" data-filter="data">Data & Analytics</button>
+                    <button class="filter-chip" data-filter="software">Application & Software</button>
+                    <button class="filter-chip" data-filter="delivery">Delivery & Strategy</button>
+                </div>
+            </div>
+
+            <div class="row g-4" id="skillsContainer">
+                <div class="col-md-6 col-lg-3 skill-item" data-category="oracle">
+                    <div class="glass-panel p-4 h-100">
+                        <div class="text-ey mb-3"><i class="fa-solid fa-cloud-bolt fs-2"></i></div>
+                        <h3 class="h5 text-white mb-3">Oracle Ecosystem</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="skill-pill">ORMB</span>
+                            <span class="skill-pill">CCS</span>
+                            <span class="skill-pill">Oracle Integration Cloud (OIC)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 skill-item" data-category="data">
+                    <div class="glass-panel p-4 h-100">
+                        <div class="text-info mb-3"><i class="fa-solid fa-chart-pie fs-2"></i></div>
+                        <h3 class="h5 text-white mb-3">Data & Analytics</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="skill-pill">Advanced SQL</span>
+                            <span class="skill-pill">Tableau Dashboards</span>
+                            <span class="skill-pill">BI Workflows</span>
+                            <span class="skill-pill">Data Reconciliation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 skill-item" data-category="software">
+                    <div class="glass-panel p-4 h-100">
+                        <div class="text-success mb-3"><i class="fa-solid fa-code fs-2"></i></div>
+                        <h3 class="h5 text-white mb-3">Application & Software Engineering</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="skill-pill">Mobile & Web Platforms</span>
+                            <span class="skill-pill">Scalable Architecture</span>
+                            <span class="skill-pill">Location-Based Services</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 skill-item" data-category="delivery">
+                    <div class="glass-panel p-4 h-100">
+                        <div class="text-warning mb-3"><i class="fa-solid fa-list-check fs-2"></i></div>
+                        <h3 class="h5 text-white mb-3">Delivery & Strategy</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="skill-pill">FDDs</span>
+                            <span class="skill-pill">SIT</span>
+                            <span class="skill-pill">Defect Resolution</span>
+                            <span class="skill-pill">AI Adoption Strategy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal fade" id="resumeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel border-warning text-white">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title font-heading fw-bold"><i class="fa-solid fa-file-pdf text-ey me-2"></i> Download CV</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fa-solid fa-circle-check text-ey display-3 mb-3"></i>
+                    <h4 class="h5 text-white">Royce - Curriculum Vitae</h4>
+                    <p class="text-secondary small mb-4">Application Design & Developer • EY GDS Philippines</p>
+                    <button class="btn btn-ey w-100" onclick="confirmCVDownload()">
+                        <i class="fa-solid fa-download me-2"></i> Confirm Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scrollTopBtn" onclick="scrollToTop()">
+        <i class="fa-solid fa-arrow-up"></i>
+    </div>
+
+    <footer class="py-5 bg-black border-top border-secondary border-opacity-25">
+        <div class="container text-center">
+            <div class="d-flex justify-content-center gap-4 fs-4 mb-4">
+                <a href="https://linkedin.com" target="_blank" class="text-secondary"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="mailto:royce@example.com" class="text-secondary"><i class="fa-solid fa-envelope"></i></a>
+                <a href="https://github.com" target="_blank" class="text-secondary"><i class="fa-brands fa-github"></i></a>
+            </div>
+            <p class="text-secondary small mb-0">&copy; 2026 Royce. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            scrollTopBtn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const filterChips = document.querySelectorAll('.filter-chip');
+        const skillItems = document.querySelectorAll('.skill-item');
+        const searchInput = document.getElementById('skillSearchInput');
+
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                applySkillFilters();
+            });
+        });
+
+        if (searchInput) {
+            searchInput.addEventListener('input', applySkillFilters);
+        }
+
+        function applySkillFilters() {
+            const activeFilter = document.querySelector('.filter-chip.active').getAttribute('data-filter');
+            const searchQuery = searchInput.value.toLowerCase().trim();
+
+            skillItems.forEach(item => {
+                const category = item.getAttribute('data-category');
+                const textContent = item.textContent.toLowerCase();
+
+                const matchesCategory = (activeFilter === 'all' || category === activeFilter);
+                const matchesSearch = textContent.includes(searchQuery);
+
+                item.style.display = (matchesCategory && matchesSearch) ? 'block' : 'none';
+            });
+        }
+
+        function triggerResumeModal() {
+            const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
+            modal.show();
+        }
+
+        function confirmCVDownload() {
+            const resumeModalEl = document.getElementById('resumeModal');
+            const modalInstance = bootstrap.Modal.getInstance(resumeModalEl);
+            if (modalInstance) modalInstance.hide();
+
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed bottom-0 end-0 p-3';
+            toast.style.zIndex = '1080';
+            toast.innerHTML = `
+                <div class="toast show bg-dark text-white border border-warning" role="alert">
+                    <div class="toast-header bg-black text-warning">
+                        <strong class="me-auto"><i class="fa-solid fa-file-circle-check me-2"></i> Download Started</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        Royce_CV_EY_GDS_Developer.pdf download initiated.
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
+</body>
+</html>
